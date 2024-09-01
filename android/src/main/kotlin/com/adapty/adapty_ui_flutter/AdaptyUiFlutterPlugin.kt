@@ -1,5 +1,6 @@
 package com.adapty.adapty_ui_flutter
 
+import android.util.Log
 import com.adapty.internal.crossplatform.ui.CrossplatformUiHelper
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -22,10 +23,13 @@ class AdaptyUiFlutterPlugin : FlutterPlugin, ActivityAware, MethodCallHandler {
     }
 
     override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-        if (CrossplatformUiHelper.init(flutterPluginBinding.applicationContext)) {
-            channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME).also { channel ->
-                channel.setMethodCallHandler(this)
-            }
+        val iniailized = CrossplatformUiHelper.init(flutterPluginBinding.applicationContext)
+        if (!iniailized) {
+            Log.d("AdaptyUiFlutterPlugin", "CrossplatformUiHelper.init failed.")
+        }
+
+        channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME).also { channel ->
+            channel.setMethodCallHandler(this)
         }
         channel?.let { channel -> callHandler.handleUiEvents(channel) }
     }
